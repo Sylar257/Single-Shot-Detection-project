@@ -20,6 +20,8 @@
     *   Phase III: Applying batchnorm to just base/auxiliary/both and comparing transfer learning and training-from-scratch from the [ScratchDet paper](https://arxiv.org/abs/1810.08425)
     *   Phase IV: Learning an optimal weighting from this paper: [Geometric loss functions for camera pose regression with deep learning](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf)
     
+    ![Performance comparison](images/Performance comparison.png)
+    
     
     
     ## Batchnorm implementation
