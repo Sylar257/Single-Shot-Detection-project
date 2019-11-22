@@ -1,6 +1,6 @@
 - - # README
 
-    When people first started with Object Detection Task, the idea was to complete the task in two stages:
+    When people first started with Object Detection Task(R-CNN series), the idea was to complete the task in two stages:
 
     * propose interesting regions to perform detection
     * and actually detect within the proposed regions
@@ -9,7 +9,7 @@
 
     Single-Shot Detection(SSD) along with YOLO(v3) are two algorithms that excel with decent accuracy and extremely fast speed. 
 
-    Acknowledgement: This is another project heavily guided by [sgrvinod’s](https://github.com/sgrvinod) tutorials. A big shout out for sgrvinod and his fantastic guides for learning various deep learning techniques. This project also depends on a number of really insightful academic papers such as: [SSD: Single Shot MultiBox Detector](https://arxiv.org/pdf/1512.02325.pdf), [Scalable Object Detection using Deep Neural Networks](https://arxiv.org/pdf/1512.02325.pdf),[ScratchDet](https://arxiv.org/abs/1810.08425) and [Non-Maximum suppression](https://arxiv.org/pdf/1705.02950.pdf) just to name a few.
+    Acknowledgement: This is another project heavily guided by [sgrvinod’s](https://github.com/sgrvinod) tutorials. A big shout out for sgrvinod and his fantastic guides for learning various deep learning techniques. This project also depends on a number of really insightful academic papers such as: [SSD: Single Shot MultiBox Detector](https://arxiv.org/pdf/1512.02325.pdf), [Scalable Object Detection using Deep Neural Networks](https://arxiv.org/pdf/1512.02325.pdf),[ScratchDet](https://arxiv.org/abs/1810.08425),[learning rate annealing](https://arxiv.org/pdf/1608.03983.pdf) and [Non-Maximum suppression](https://arxiv.org/pdf/1705.02950.pdf) just to name a few.
 
     ## Project Overview
 
@@ -18,13 +18,21 @@
     *   Phase I: Vannila SSD300. An exact replica of the [original paper](https://arxiv.org/pdf/1512.02325.pdf).
     *   Phase II: We implement better [initialization techniques](https://arxiv.org/pdf/1502.01852.pdf) and implement [learning rate annealing](https://arxiv.org/pdf/1608.03983.pdf)
     *   Phase III: Applying batchnorm to just base/auxiliary/both and comparing transfer learning and training-from-scratch from the [ScratchDet paper](https://arxiv.org/abs/1810.08425)
-    *   Phase IV: Learning an optimal weighting from this paper: [Geometric loss functions for camera pose regression with deep learning](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf)
+    *   Phase IV: Learning an optimal weighting from this paper: [Geometric loss functions for camera pose regression with deep learning](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf)![Performance comparison](images/Performance comparison.png)
     
-    <img src="images/Performance comparison.png" alt="Performance comparison" style="zoom:140%;" />
+    The **Vanilla model** is a exact replica of the model used in the original paper. We have a mAP of **74.6** which is quite a bit lower than the state-of-the-art result of the paper’s result(**77.2**, which we will be using for benchmarking). This is understandable since Wei, et al. must have tried different hyper-parameter combinations and presented the best performing one. 
+    
+    Don’t worry. In the next phase, we will be implementing `Kaiming_norm` initialization to layers that we are not transfer learning and also apply `learning rate annealing`. This two technique will give us a slight edge over the original design and bring us to an mAP of **77.3**.
+    
+    Of course, we don’t stop here. Phase III is all about **Batch-normalization**. We will be experimenting how batch-norm effect the loss during training and, naturally, the final accuracy. `nn.Batchnorm2d` will be injected in the `VGGbase` layers and `Auxiliary` layers for comparison. The resulting mAPs are **78.8** and **79.1**, respectively.
+    
+    The motivation for the final attempt was that there is parameter $\alpha$ which indicates the ratio between our two losses for the back-prop. In the [original paper](https://arxiv.org/pdf/1512.02325.pdf) $\alpha$ was directly set to `1`. This is not very convincing since $\alpha$ was not mathematically derived and there might exist another values for $\alpha$ that give us better training results. For this attempt, we will be implementing the technique of **learning the optimal weighting** for tasks with multiple losses from [this paper](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf). Unfortunately, this method gives around **77.7*6 mAP even after numerous fine-tuning. Thus, it seems that this strategy applies well on their problem but not quite on ours.
+    
+    ## Technical details used in this REPO
     
     
     
-    ## Batchnorm implementation
+    ### Batchnorm implementation
     
     The original SSD architecture is Batchnorm-free. The inspiration is from this paper:[ScratchDet: Training Single-Shot Object Detectors from Scratch](https://arxiv.org/pdf/1810.08425.pdf). Objection detection’s current state-of-the-art detectors are generally fine-tuned from high accuracy classification networks. *e.g.*, VGGNet(which we will be using), ResNet and GoogLeNet **pre-trained** on ImageNet. There  both are advantages and disadvantages to use pre-trained base net. One of the primary reason not to train from scratch is that the optimization landscape is bumpy and not idea for training. Fortunately, now we have Batchnorm that could greatly mitigate this issue. This idea is introduced in [this paper](https://arxiv.org/pdf/1810.08425.pdf), and in this project’s Phase-III we shall utilize the idea of batchnorm to further improve our training result.
     
@@ -38,7 +46,7 @@
     
     
     
-    ## Learning optimal learning rate
+    ### Learning optimal learning rate
     
     SSD has two loss functions that we want to minimize: confidence loss & location loss (details included in later section).
     
@@ -49,8 +57,7 @@
     L_\alpha(I) = L_c(I)\exp({-\hat{s_c}})+\hat{s_c}+L_l(I)\exp({-\hat{s_l}})+\hat{s_l}
     $$
     
-    
-    ## An overview of SSD
+    ### The SSD architecture
     
     Single-Shot Detection has three main components:
     
@@ -75,7 +82,7 @@
     * To further reduce computation, we decrease size of each filter by sub-sampling parameters from the converted convolutional layers. Output dimension changes from `7,7,512` to `3,3,512`. `conv6` use `1024` filters instead of `4096` thus, `conv6`:`1024,3,3,512`.
     * `conv7` use `1024` filters from `conv6`, each with dimensions `1,1,1024`.
     
-    ### Priors in SSD
+    #### Priors in SSD
     
     Priors are *precalculated*, *fixed* boxes which collectively represent this universe of probable and approximate box predictions.
     
@@ -96,7 +103,7 @@
     * The priors does not represent our final predicted boxes cause that might be inaccurate. Rather, *priors* represent approximately, the possibilities for prediction. This means: **We use each prior as an approximate starting point and then find out how much it needs to be adjusted to obtain a more exact prediction for a bounding box**
     * Hence, if each predicted bounding box is a slight deviation from a prior, and our gold is to calculate this deviation, we need a way to measure and quantify it.
     
-    ### Calculating regression loss for bounding boxes
+    #### Calculating regression loss for bounding boxes
     
     Consider bounding boxes defined as — centre of x, centre of y, width, height: $(C_x,C_y,w,h)$.
     
@@ -111,7 +118,7 @@
     $$
     $(g_{c_x}, g_{c_y}, g_w, g_h)$ now represents our loss for which we will regress bounding boxes’ coordinates on.
     
-    ### Predictions
+    #### Predictions
     
     We have defined priors for six feature maps of vairous scales and granularity. From `conv4_3`, `conv7`, `conv8_2`, `conv9_2`, `conv10_2` ,and `conv11_2`.
     
@@ -130,13 +137,13 @@
     
       The `n_classes` filters for a prior calculate a set of `n_classes` scores for that prior.
     
-    ### Calculating Multibox loss
+    #### Calculating Multibox loss
     
     Object detection task has a special loss calculation  case as it’s calculating the loss of a classification task and regression task all together.
     
     Therefore, our total loss would be an **aggregation of losses from both types of predictions** — bounding box localization and class scores.
     
-    #### Matching predictions to ground truth
+    ##### Matching predictions to ground truth
     
     For any supervised learning algorithm, we need to be able to match predictions to their ground truths. This is tricky in *Object Detection* since **we don’t have the output—ground truth paring before hand**
     
@@ -162,7 +169,7 @@
     L_{loc} = \frac{1}{n_{positives}}(\sum_{positives}Smooth L_1 Loss)
     $$
     
-    ### Confidence loss
+    #### Confidence loss
     
     Every prediction, no matter positive or negative, has a ground truth label associated with it. It is important that the model recognises both objects and a lack of them(background).
     
@@ -180,7 +187,7 @@
     $$
     Notice that we only average over **number of positives**, hence the *hard negative losses* acts as a additional loss.
     
-    ### Total loss
+    #### Total loss
     
     Now that we have two losses: $L_{loc}$ and $L_{conf}$, we just need to aggregate them with a combined ratio $\alpha$:
     $$
@@ -188,7 +195,7 @@
     $$
      The good thing is, we don’t even have to decide the value for $\alpha$ as it could be a learnable parameter.
     
-    ### Non-Maximum Suppression (NMS)
+    #### Non-Maximum Suppression (NMS)
     
     After the model is trained, we can apply it to images. However, the predictions are still in their raw form—two tensors containing the offsets and class scores fore 8732 priors. These would need to be processed to **obtain final, human-interpretable bounding boxes with labels.** 
     
@@ -230,7 +237,7 @@
       * Consider the next highest-scoring candidate still remaining in the pool. Repeat the same eliminating process
       * Run through the entire sorted candidates within this class and move on to the next
     
-    ### weight initialization
+    #### weight initialization
     
     We will initialise the Auxiliary Convolution layers with `nn.init.kaiming_uniform_(c.weight, nonlinearity='relu')` just to compare with result with traditional `nn.init.xavier_uniform_`.
     
