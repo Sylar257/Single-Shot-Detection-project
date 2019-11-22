@@ -26,7 +26,7 @@
   
   Of course, we don’t stop here. Phase III is all about **Batch-normalization**. We will be experimenting how batch-norm effect the loss during training and, naturally, the final accuracy. `nn.Batchnorm2d` will be injected in the `VGGbase` layers and `Auxiliary` layers for comparison. The resulting mAPs are **78.8** and **79.1**, respectively.
   
-  The motivation for the final attempt was that there is parameter $\alpha$ which indicates the ratio between our two losses for the back-prop. In the [original paper](https://arxiv.org/pdf/1512.02325.pdf) $\alpha$ was directly set to `1`. This is not very convincing since $\alpha$ was not mathematically derived and there might exist another values for $\alpha$ that give us better training results. For this attempt, we will be implementing the technique of **learning the optimal weighting** for tasks with multiple losses from [this paper](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf). Unfortunately, this method gives around **77.6** mAP even after numerous fine-tuning. Thus, it seems that this strategy applies well on their problem but not quite on ours.
+  The motivation for the final attempt was that there is parameter <img src="https://render.githubusercontent.com/render/math?math=\alpha"> which indicates the ratio between our two losses for the back-prop. In the [original paper](https://arxiv.org/pdf/1512.02325.pdf) <img src="https://render.githubusercontent.com/render/math?math=\alpha"> was directly set to `1`. This is not very convincing since $\alpha$ was not mathematically derived and there might exist another values for  <img src="https://render.githubusercontent.com/render/math?math=\alpha">that give us better training results. For this attempt, we will be implementing the technique of **learning the optimal weighting** for tasks with multiple losses from [this paper](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf). Unfortunately, this method gives around **77.6** mAP even after numerous fine-tuning. Thus, it seems that this strategy applies well on their problem but not quite on ours.
   
   ## Technical details used in this REPO
   
@@ -53,9 +53,8 @@
   As we are training the network jointly with the two loss, a natural question to ask is that what’s the optimal ratio of these two losses to back-propagate so that we have the best training efficiency. In the [original SSD paper](https://arxiv.org/pdf/1512.02325.pdf), this question is not answered by simply assigned `ratio = 1` to the two losses and it seemed to work just fine.
   
   In the phase IV of this repo, we will be experimenting setting this ratio as two learnable parameters(one for each loss) following the guide in [this paper](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf).:
-  $$
-  L_\alpha(I) = L_c(I)\exp({-\hat{s_c}})+\hat{s_c}+L_l(I)\exp({-\hat{s_l}})+\hat{s_l}
-  $$
+  
+  <img src="https://render.githubusercontent.com/render/math?math=L_\alpha(I) = L_c(I)\exp({-\hat{s_c}})+\hat{s_c}+L_l(I)\exp({-\hat{s_l}})+\hat{s_l}">
   
   ### The SSD architecture
   
