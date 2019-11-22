@@ -26,7 +26,7 @@
   
   Of course, we don’t stop here. Phase III is all about **Batch-normalization**. We will be experimenting how batch-norm effect the loss during training and, naturally, the final accuracy. `nn.Batchnorm2d` will be injected in the `VGGbase` layers and `Auxiliary` layers for comparison. The resulting mAPs are **78.8** and **79.1**, respectively.
   
-  The motivation for the final attempt was that there is parameter <img src="https://render.githubusercontent.com/render/math?math=\alpha"> which indicates the ratio between our two losses for the back-prop. In the [original paper](https://arxiv.org/pdf/1512.02325.pdf) <img src="https://render.githubusercontent.com/render/math?math=\alpha"> was directly set to `1`. This is not very convincing since $\alpha$ was not mathematically derived and there might exist another values for  <img src="https://render.githubusercontent.com/render/math?math=\alpha">that give us better training results. For this attempt, we will be implementing the technique of **learning the optimal weighting** for tasks with multiple losses from [this paper](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf). Unfortunately, this method gives around **77.6** mAP even after numerous fine-tuning. Thus, it seems that this strategy applies well on their problem but not quite on ours.
+  The motivation for the final attempt was that there is parameter <img src="https://render.githubusercontent.com/render/math?math=\alpha"> which indicates the ratio between our two losses for the back-prop. In the [original paper](https://arxiv.org/pdf/1512.02325.pdf) <img src="https://render.githubusercontent.com/render/math?math=\alpha"> was directly set to `1`. This is not very convincing since <img src="https://render.githubusercontent.com/render/math?math=\alpha"> was not mathematically derived and there might exist another values for  <img src="https://render.githubusercontent.com/render/math?math=\alpha">that give us better training results. For this attempt, we will be implementing the technique of **learning the optimal weighting** for tasks with multiple losses from [this paper](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf). Unfortunately, this method gives around **77.6** mAP even after numerous fine-tuning. Thus, it seems that this strategy applies well on their problem but not quite on ours.
   
   ## Technical details used in this REPO
   
@@ -54,7 +54,7 @@
   
   In the phase IV of this repo, we will be experimenting setting this ratio as two learnable parameters(one for each loss) following the guide in [this paper](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf).:
   
-  <img src="https://render.githubusercontent.com/render/math?math=L_\alpha(I) = L_c(I)\exp({-\hat{s_c}})+\hat{s_c}+L_l(I)\exp({-\hat{s_l}})+\hat{s_l}">
+  <img src="https://render.githubusercontent.com/render/math?math=L_\alpha(I) = L_c(I)\exp({-\hat{s_c}})%2B\hat{s_c}%2BL_l(I)\exp({-\hat{s_l}})%2B\hat{s_l}">
   
   ### The SSD architecture
   
@@ -94,17 +94,16 @@
   * At each position on a feature map, there will be priors of various aspect ratios. All feature maps will have priors with ratios `1:1, 2:1, 1:2`. The intermediate feature maps of `conv7`, `conv8_2`, and `conv9_2` will also have priors with ratios `3:1, 1:3`. Moreover, all feature maps will have *one extra prior* with a n aspecti ratios of `1:1` and at a scale that is the geometric mean of the scales of the current and subsequent feature map.
   * We define the priors in terms of their *scales (s)* and *aspect ratios (a)*:
   
-  $$
-  w*h = s^2\\
-  \frac{w}{h} = a
-  $$
+  ![formula](https://render.githubusercontent.com/render/math?math=w*h = s^2)
+  
+  ![formula](https://render.githubusercontent.com/render/math?math=\frac{w}{h} = a)
   
   * The priors does not represent our final predicted boxes cause that might be inaccurate. Rather, *priors* represent approximately, the possibilities for prediction. This means: **We use each prior as an approximate starting point and then find out how much it needs to be adjusted to obtain a more exact prediction for a bounding box**
   * Hence, if each predicted bounding box is a slight deviation from a prior, and our gold is to calculate this deviation, we need a way to measure and quantify it.
   
   #### Calculating regression loss for bounding boxes
   
-  Consider bounding boxes defined as — centre of x, centre of y, width, height: $(C_x,C_y,w,h)$.
+  Consider bounding boxes defined as — centre of x, centre of y, width, height: ![formula](https://render.githubusercontent.com/render/math?math=(C_x,C_y,w,h)).
   
    ![Prior_regression](images/Prior_regression.png)
   
