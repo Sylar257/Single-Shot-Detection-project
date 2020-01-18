@@ -7,7 +7,7 @@
 
   While the accuracy of these algorithms are generally pretty awesome, the drawback of these approaches being that the 2-step-strategy is computationally very expensive for real-time applications.
 
-  Single-Shot Detection(SSD) along with YOLO(v3) are two algorithms that excel with decent accuracy and extremely fast speed. 
+  **Single-Shot Detection**(SSD) along with **YOLO**(v3) are two algorithms that excel with decent accuracy and extremely fast speed. 
 
   Acknowledgement: This is another project heavily guided by [sgrvinod’s](https://github.com/sgrvinod) tutorials. A big shout out for sgrvinod and his fantastic guides for learning various deep learning techniques. This project also depends on a number of really insightful academic papers such as: [SSD: Single Shot MultiBox Detector](https://arxiv.org/pdf/1512.02325.pdf), [Scalable Object Detection using Deep Neural Networks](https://arxiv.org/pdf/1512.02325.pdf),[ScratchDet](https://arxiv.org/abs/1810.08425),[learning rate annealing](https://arxiv.org/pdf/1608.03983.pdf) and [Non-Maximum suppression](https://arxiv.org/pdf/1705.02950.pdf) just to name a few.
 
@@ -15,10 +15,11 @@
 
   There are 4 phases in this project each carries a purpose of implementing different deep learning techniques and experiment with its performance.
 
-  *   Phase I: Vannila SSD300. An exact replica of the [original paper](https://arxiv.org/pdf/1512.02325.pdf).
-  *   Phase II: We implement better [initialization techniques](https://arxiv.org/pdf/1502.01852.pdf) and implement [learning rate annealing](https://arxiv.org/pdf/1608.03983.pdf)
-  *   Phase III: Applying batchnorm to just base/auxiliary/both and comparing transfer learning and training-from-scratch from the [ScratchDet paper](https://arxiv.org/abs/1810.08425)
-  *   Phase IV: Learning an optimal weighting from this paper: [Geometric loss functions for camera pose regression with deep learning](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf)![Performance comparison](images/Performance comparison.png)
+  *   Phase I: **Vannila SSD300**. An exact replica of the [original paper](https://arxiv.org/pdf/1512.02325.pdf).
+  *   Phase II: We implement better **[initialization techniques](https://arxiv.org/pdf/1502.01852.pdf)** and implement **[learning rate annealing](https://arxiv.org/pdf/1608.03983.pdf)**
+  *   Phase III: Applying **`batchnorm`** to just base/auxiliary/both and comparing transfer learning and training-from-scratch from the **[ScratchDet paper](https://arxiv.org/abs/1810.08425)**
+  *   Phase IV: Learning an **optimal weighting** from this paper: [Geometric loss functions for camera pose regression with deep learning](https://zpascal.net/cvpr2017/Kendall_Geometric_Loss_Functions_CVPR_2017_paper.pdf)
+  *   ![Performance comparison](images/Performance_comparison.png)
   
   The **Vanilla model** is a exact replica of the model used in the original paper. We have a mAP of **74.6** which is quite a bit lower than the state-of-the-art result of the paper’s result(**77.2**, which we will be using for benchmarking). This is understandable since Wei, et al. must have tried different hyper-parameter combinations and presented the best performing one. 
   
