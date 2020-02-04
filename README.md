@@ -1,8 +1,10 @@
 - # README
 
-  When people first started with Object Detection Task(R-CNN series), the idea was to complete the task in two stages:
+  ![object_detection](images/object_detection.jpg)
 
-  * propose interesting regions to perform detection
+  When people first started with Object Detection Task(R-CNN series), the idea was to complete the task in two stages:
+  
+* propose interesting regions to perform detection
   * and actually detect within the proposed regions
 
   While the accuracy of these algorithms are generally pretty awesome, the drawback of these approaches being that the 2-step-strategy is computationally very expensive for real-time applications.
@@ -14,7 +16,7 @@
   ## Project Overview
 
   There are 4 phases in this project each carries a purpose of implementing different deep learning techniques and experiment with its performance.
-
+  
   *   Phase I: **Vannila SSD300**. An exact replica of the [original paper](https://arxiv.org/pdf/1512.02325.pdf).
   *   Phase II: We implement better **[initialization techniques](https://arxiv.org/pdf/1502.01852.pdf)** and implement **[learning rate annealing](https://arxiv.org/pdf/1608.03983.pdf)**
   *   Phase III: Applying **`batchnorm`** to just base/auxiliary/both and comparing transfer learning and training-from-scratch from the **[ScratchDet paper](https://arxiv.org/abs/1810.08425)**
