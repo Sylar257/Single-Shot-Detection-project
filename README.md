@@ -1,9 +1,7 @@
 - # README
 
-  ![object_detection](images/object_detection.jpg)
-
   When people first started with Object Detection Task(R-CNN series), the idea was to complete the task in two stages:
-  
+
 * propose interesting regions to perform detection
   * and actually detect within the proposed regions
 
@@ -13,8 +11,10 @@
 
   Acknowledgement: This is another project heavily guided by [sgrvinod’s](https://github.com/sgrvinod) tutorials. A big shout out for sgrvinod and his fantastic guides for learning various deep learning techniques. This project also depends on a number of really insightful academic papers such as: [SSD: Single Shot MultiBox Detector](https://arxiv.org/pdf/1512.02325.pdf), [Scalable Object Detection using Deep Neural Networks](https://arxiv.org/pdf/1512.02325.pdf),[ScratchDet](https://arxiv.org/abs/1810.08425),[learning rate annealing](https://arxiv.org/pdf/1608.03983.pdf) and [Non-Maximum suppression](https://arxiv.org/pdf/1705.02950.pdf) just to name a few.
 
-  ## Project Overview
+  ![computer_vision2](images/computer_vision2.jpg)
 
+  ## Project Overview
+  
   There are 4 phases in this project each carries a purpose of implementing different deep learning techniques and experiment with its performance.
   
   *   Phase I: **Vannila SSD300**. An exact replica of the [original paper](https://arxiv.org/pdf/1512.02325.pdf).
